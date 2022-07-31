@@ -55,15 +55,12 @@ fn get_transaction_id(id: u16) -> String {
 }
 
 #[get("/transaction")]
-fn get_transaction_all() -> &'static str {
+fn get_transaction_all() -> Option<Json<Vec<Transaction>>> {
     let results = transactions::table
         .load::<Transaction>(&mut establish_connection())
         .expect("Error loading transactions");
 
-    for transaction in results {
-        println!("{}", transaction.id);
-    }
-    "Get all transaction"
+    Some(Json(results))
 }
 
 #[post("/transaction", data = "<_transaction>", rank = 3)]
@@ -87,11 +84,10 @@ fn create_transaction_form(_transaction: Form<TransactionPost>) -> Redirect {
 #[launch]
 fn rocket() -> Rocket<Build> {
     rocket::build()
+        .mount("/", routes![index, submit,])
         .mount(
-            "/",
+            "/api",
             routes![
-                index,
-                submit,
                 get_transaction_id,
                 get_transaction_all,
                 create_transaction_json,

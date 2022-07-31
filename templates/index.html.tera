@@ -22,7 +22,7 @@
         <input type="submit" value="Submit"/>
       </form>
       <p>POST /transaction</p>
-      <form action="/transaction" method="post">
+      <form action="/api/transaction" method="post">
         <input type="text" name="value"/>
         <br>
         <input type="submit" value="Submit"/>
