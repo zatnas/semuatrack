@@ -1,0 +1,7 @@
+CREATE TABLE 'transactions' (
+	id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+	datetime INTEGER,
+	amount REAL NOT NULL,
+	note TEXT,
+	place TEXT
+);
