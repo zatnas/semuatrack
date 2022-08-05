@@ -24,6 +24,7 @@
       <p>POST /transaction</p>
       <form action="/api/transaction" method="post">
         <input type="text" name="value"/>
+        <input type="datetime-local" name="datetime"/>
         <br>
         <input type="submit" value="Submit"/>
       </form>
