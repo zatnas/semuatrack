@@ -7,10 +7,11 @@ extern crate dotenv;
 use diesel::prelude::*;
 use dotenv::dotenv;
 use rocket::form::{Context, Form};
+use rocket::fs::{relative, FileServer};
 use rocket::response::Redirect;
 use rocket::serde::{json::Json, Deserialize};
 use rocket::{Build, Rocket};
-use rocket_dyn_templates::Template;
+use rocket_dyn_templates::{context, Template};
 use std::env;
 
 mod models;
@@ -29,7 +30,7 @@ fn establish_connection() -> SqliteConnection {
 
 #[derive(Deserialize, FromForm)]
 struct TransactionPost {
-    value: f32,
+    amount: f32,
 }
 
 #[derive(FromForm)]
@@ -55,6 +56,16 @@ fn get_transaction_id(id: u16) -> String {
 }
 
 #[get("/transaction")]
+fn transaction_ui() -> Template {
+    Template::render(
+        "transaction",
+        context!(
+        title: "Transaction"
+        ),
+    )
+}
+
+#[get("/transaction")]
 fn get_transaction_all() -> Option<Json<Vec<Transaction>>> {
     let results = transactions::table
         .load::<Transaction>(&mut establish_connection())
@@ -65,26 +76,26 @@ fn get_transaction_all() -> Option<Json<Vec<Transaction>>> {
 
 #[post("/transaction", data = "<_transaction>", rank = 3)]
 fn create_transaction_json(_transaction: Json<TransactionPost>) {
-    println!("{}", _transaction.value)
+    println!("{}", _transaction.amount)
 }
 
 #[post("/transaction", data = "<_transaction>", rank = 2)]
-fn create_transaction_form(_transaction: Form<TransactionPost>) -> Redirect {
-    println!("Add new transaction{}", _transaction.value);
+fn create_transaction_form(_transaction: Form<TransactionPost>) {
+    println!("Add new transaction: {}", _transaction.amount);
     let new_transaction = TransactionCreate {
-        amount: _transaction.value,
+        amount: _transaction.amount,
     };
     let _insert = diesel::insert_into(transactions::table)
         .values(&new_transaction)
         .execute(&mut establish_connection())
         .expect("Error creating new transaction");
-    Redirect::to(uri!(index))
 }
 
 #[launch]
 fn rocket() -> Rocket<Build> {
     rocket::build()
-        .mount("/", routes![index, submit,])
+        .mount("/", routes![index, submit, transaction_ui])
+        .mount("/", FileServer::from(relative!("static")))
         .mount(
             "/api",
             routes![
