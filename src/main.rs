@@ -28,25 +28,26 @@ fn establish_connection() -> SqliteConnection {
         .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
 }
 
-#[derive(Deserialize, FromForm)]
+#[derive(FromForm, Deserialize, Clone)]
 struct TransactionPost {
     amount: f32,
+    note: String,
+    place: String,
 }
 
 #[derive(FromForm)]
 struct PostExample {
-    value: i64,
+    amount: i64,
 }
 
 #[get("/")]
-fn index() -> Template {
-    // "Application successfully started"
-    Template::render("index", &Context::default())
+fn index() -> Redirect {
+    Redirect::to(uri!(transaction_ui()))
 }
 
 #[post("/", data = "<_post_example>")]
 fn submit(_post_example: Form<PostExample>) -> Template {
-    println!("{}", _post_example.value);
+    println!("{}", _post_example.amount);
     Template::render("index", &Context::default())
 }
 
@@ -68,33 +69,41 @@ fn transaction_ui() -> Template {
 #[get("/transaction")]
 fn get_transaction_all() -> Option<Json<Vec<Transaction>>> {
     let results = transactions::table
+        .order(transactions::id.desc())
         .load::<Transaction>(&mut establish_connection())
         .expect("Error loading transactions");
 
     Some(Json(results))
 }
 
-#[post("/transaction", data = "<_transaction>", rank = 3)]
-fn create_transaction_json(_transaction: Json<TransactionPost>) {
-    println!("{}", _transaction.amount)
+#[post("/transaction", data = "<transaction>", rank = 3)]
+fn create_transaction_json(transaction: Json<TransactionPost>) {
+    println!("{}", transaction.amount)
 }
 
-#[post("/transaction", data = "<_transaction>", rank = 2)]
-fn create_transaction_form(_transaction: Form<TransactionPost>) {
-    println!("Add new transaction: {}", _transaction.amount);
+#[post("/transaction", data = "<transaction>", rank = 2)]
+fn create_transaction_form(transaction: Form<TransactionPost>) -> Redirect {
+    println!("Add new transaction: {}", transaction.amount);
+    let transaction = transaction.clone();
     let new_transaction = TransactionCreate {
-        amount: _transaction.amount,
+        amount: transaction.amount,
+        note: Some(transaction.note),
+        place: Some(transaction.place),
     };
     let _insert = diesel::insert_into(transactions::table)
         .values(&new_transaction)
         .execute(&mut establish_connection())
         .expect("Error creating new transaction");
+    Redirect::to(uri!(transaction_ui()))
 }
 
 #[launch]
 fn rocket() -> Rocket<Build> {
     rocket::build()
-        .mount("/", routes![index, submit, transaction_ui])
+        .mount(
+            "/",
+            routes![index, submit, transaction_ui, create_transaction_form],
+        )
         .mount("/", FileServer::from(relative!("static")))
         .mount(
             "/api",
@@ -102,7 +111,6 @@ fn rocket() -> Rocket<Build> {
                 get_transaction_id,
                 get_transaction_all,
                 create_transaction_json,
-                create_transaction_form,
             ],
         )
         .attach(Template::fairing())

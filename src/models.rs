@@ -15,4 +15,6 @@ pub struct Transaction {
 #[diesel(table_name = transactions)]
 pub struct TransactionCreate {
     pub amount: f32,
+    pub note: Option<String>,
+    pub place: Option<String>,
 }

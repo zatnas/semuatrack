@@ -3,10 +3,24 @@
 {% block content %}
 <div class="card my-3">
 	<div class="card-body">
-		<form action="/api/transaction" method="POST">
-			<div class="mb-3">
-				<label for="amount_input" class="form-label">Amount</label>
-				<input id="amount_input" name="amount" class="form-control" type="number" pattern="\d+\.\d{2}" step="0.01">
+		<form action="/transaction" method="POST">
+			<div class="row mb-3">
+				<label for="amount_input" class="col-md-2 col-form-label">Amount</label>
+				<div class="col-md-10">
+					<input id="amount_input" name="amount" class="form-control" type="number" pattern="\d+\.\d{2}" step="0.01">
+				</div>
+			</div>
+			<div class="row mb-3">
+				<label for="note_input" class="col-md-2 col-form-label">Note</label>
+				<div class="col-md-10">
+					<input id="note_input" name="note" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="row mb-3">
+				<label for="place_input" class="col-md-2 col-form-label">Place</label>
+				<div class="col-md-10">
+					<input id="place_input" name="place" class="form-control" type="text">
+				</div>
 			</div>
 			<button type="submit" class="btn btn-primary">Submit</button>
 		</form>
@@ -18,6 +32,10 @@
 		<button id="refresh_button" class="btn btn-primary">Refresh</button>
 	</div>
 	<div class="card-body">
+		<div class="card">
+			<ul id="transaction_list" class="list-group list-group-flush user-select-none">
+			</ul>
+		</div>
 	</div>
 </div>
 {% endblock content %}
