@@ -1,9 +1,5 @@
+// load list of transactions
 let transaction_list = document.querySelector("#transaction_list");
-
-transaction_list.addEventListener("dblclick", function(click) {
-	console.log(click);
-});
-
 fetch("/api/transaction")
 	.then((response) => response.json())
 	.then((data) => {
@@ -39,3 +35,39 @@ fetch("/api/transaction")
 			transaction_list.appendChild(li);
 		}
 	});
+
+
+// edit transaction
+transaction_list.addEventListener("dblclick", function(click) {
+	console.log(click);
+});
+
+
+// datetime
+let datetime_input = document.querySelector("#datetime_input");
+let date_input = document.querySelector("#date_input");
+let time_input = document.querySelector("#time_input");
+
+function datetime_value(
+	date_string = (new Date()).toDateString(),
+	time_string = ""
+) {
+	return Math.round(
+		(new Date(
+			`${date_string} ${time_string}`.trim()
+		))
+		.getTime()/1000 // JS UTC is in milliseconds
+	)
+}
+
+function set_datetime_value(datetime_input, date_input, time_input) {
+	datetime_input.value = datetime_value(date_input.value, time_input.value);
+}
+
+date_input.value = "";
+time_input.value = "";
+set_datetime_value(datetime_input, date_input, time_input);
+date_input.addEventListener("change",
+	() => set_datetime_value(datetime_input, date_input, time_input));
+time_input.addEventListener("change",
+	() => set_datetime_value(datetime_input, date_input, time_input));
