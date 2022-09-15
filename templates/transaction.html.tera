@@ -22,6 +22,20 @@
 					<input id="place_input" name="place" class="form-control" type="text">
 				</div>
 			</div>
+			<div class="row mb-3">
+				<label for="date_input" class="col-md-2 col-form-label">Datetime</label>
+				<div class="col-md-10">
+					<div class="input-group">
+						<input id="date_input" name="date" class="form-control" type="date">
+						<input id="time_input" name="time" class="form-control" type="time">
+						<button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">Now</button>
+						<ul class="dropdown-menu">
+							<li><button class="dropdown-item active" type="button">Now</button></li>
+							<li><button class="dropdown-item" type="button">Custom</button></li>
+						</ul>
+					</div>
+				</div>
+			</div>
 			<button type="submit" class="btn btn-primary">Submit</button>
 		</form>
 	</div>

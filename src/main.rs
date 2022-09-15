@@ -30,6 +30,7 @@ fn establish_connection() -> SqliteConnection {
 
 #[derive(FromForm, Deserialize, Clone)]
 struct TransactionPost {
+    datetime: i32,
     amount: f32,
     note: String,
     place: String,
@@ -86,6 +87,7 @@ fn create_transaction_form(transaction: Form<TransactionPost>) -> Redirect {
     println!("Add new transaction: {}", transaction.amount);
     let transaction = transaction.clone();
     let new_transaction = TransactionCreate {
+        datetime: transaction.datetime,
         amount: transaction.amount,
         note: Some(transaction.note),
         place: Some(transaction.place),

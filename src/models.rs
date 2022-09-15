@@ -5,7 +5,7 @@ use serde::Serialize;
 #[derive(Debug, Queryable, Serialize)]
 pub struct Transaction {
     pub id: i32,
-    pub datetime: Option<i32>,
+    pub datetime: i32,
     pub amount: f32,
     pub note: Option<String>,
     pub place: Option<String>,
@@ -14,6 +14,7 @@ pub struct Transaction {
 #[derive(Debug, Insertable)]
 #[diesel(table_name = transactions)]
 pub struct TransactionCreate {
+    pub datetime: i32,
     pub amount: f32,
     pub note: Option<String>,
     pub place: Option<String>,
