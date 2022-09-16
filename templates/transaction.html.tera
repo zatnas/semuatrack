@@ -28,13 +28,13 @@
 					<div class="input-group">
 						<input id="date_input" class="form-control" type="date">
 						<input id="time_input" class="form-control" type="time">
-						<button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">Now</button>
-						<ul class="dropdown-menu">
-							<li><button class="dropdown-item active" type="button">Now</button></li>
-							<li><button class="dropdown-item" type="button">Custom</button></li>
+						<button id="datetime_mode" class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">Now</button>
+						<ul id="datetime_modes" class="dropdown-menu">
+							<li><button id="datetime_now_button" class="dropdown-item active" type="button">Now</button></li>
+							<li><button id="datetime_custom_button" class="dropdown-item" type="button">Custom</button></li>
 						</ul>
-						<input id="datetime_input" name="datetime_input" type="hidden">
 					</div>
+					<input id="datetime_input" name="datetime_input" type="hidden">
 				</div>
 			</div>
 			<button type="submit" class="btn btn-primary">Submit</button>
