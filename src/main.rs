@@ -6,7 +6,7 @@ extern crate dotenv;
 
 use diesel::prelude::*;
 use dotenv::dotenv;
-use rocket::form::{Context, Form};
+use rocket::form::Form;
 use rocket::fs::{relative, FileServer};
 use rocket::response::Redirect;
 use rocket::serde::{json::Json, Deserialize};
@@ -32,8 +32,10 @@ fn establish_connection() -> SqliteConnection {
 struct TransactionPost {
     datetime: i32,
     amount: f32,
-    note: String,
-    place: String,
+    #[field(default = None)]
+    note: Option<String>,
+    #[field(default = None)]
+    place: Option<String>,
 }
 
 #[derive(FromForm)]
@@ -89,8 +91,8 @@ fn create_transaction_form(transaction: Form<TransactionPost>) -> Redirect {
     let new_transaction = TransactionCreate {
         datetime: transaction.datetime,
         amount: transaction.amount,
-        note: Some(transaction.note),
-        place: Some(transaction.place),
+        note: transaction.note,
+        place: transaction.place,
     };
     let _insert = diesel::insert_into(transactions::table)
         .values(&new_transaction)
