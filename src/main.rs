@@ -38,20 +38,9 @@ struct TransactionPost {
     place: Option<String>,
 }
 
-#[derive(FromForm)]
-struct PostExample {
-    amount: i64,
-}
-
 #[get("/")]
 fn index() -> Redirect {
     Redirect::to(uri!(transaction_ui()))
-}
-
-#[post("/", data = "<_post_example>")]
-fn submit(_post_example: Form<PostExample>) -> Template {
-    println!("{}", _post_example.amount);
-    Template::render("index", &Context::default())
 }
 
 #[get("/transaction/<id>")]
@@ -104,10 +93,7 @@ fn create_transaction_form(transaction: Form<TransactionPost>) -> Redirect {
 #[launch]
 fn rocket() -> Rocket<Build> {
     rocket::build()
-        .mount(
-            "/",
-            routes![index, submit, transaction_ui, create_transaction_form],
-        )
+        .mount("/", routes![index, transaction_ui, create_transaction_form])
         .mount("/", FileServer::from(relative!("static")))
         .mount(
             "/api",
