@@ -34,7 +34,7 @@
 							<li><button id="datetime_custom_button" class="dropdown-item" type="button">Custom</button></li>
 						</ul>
 					</div>
-					<input id="datetime_input" name="datetime_input" type="hidden">
+					<input id="datetime_input" name="datetime" type="hidden">
 				</div>
 			</div>
 			<button type="submit" class="btn btn-primary">Submit</button>
