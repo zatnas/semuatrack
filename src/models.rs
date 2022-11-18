@@ -13,9 +13,9 @@ pub struct Transaction {
 
 #[derive(Debug, Insertable)]
 #[diesel(table_name = transactions)]
-pub struct TransactionCreate {
+pub struct TransactionCreate<'r> {
     pub datetime: i32,
     pub amount: f32,
-    pub note: Option<String>,
-    pub place: Option<String>,
+    pub note: Option<&'r str>,
+    pub place: Option<&'r str>,
 }

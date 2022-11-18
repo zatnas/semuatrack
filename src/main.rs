@@ -29,13 +29,13 @@ fn establish_connection() -> SqliteConnection {
 }
 
 #[derive(FromForm, Deserialize, Clone)]
-struct TransactionPost {
+struct TransactionPost<'r> {
     datetime: i32,
     amount: f32,
     #[field(default = None)]
-    note: Option<String>,
+    note: Option<&'r str>,
     #[field(default = None)]
-    place: Option<String>,
+    place: Option<&'r str>,
 }
 
 #[get("/")]
@@ -76,7 +76,6 @@ fn create_transaction_json(transaction: Json<TransactionPost>) {
 #[post("/transaction", data = "<transaction>", rank = 2)]
 fn create_transaction_form(transaction: Form<TransactionPost>) -> Redirect {
     println!("Add new transaction: {}", transaction.amount);
-    let transaction = transaction.clone();
     let new_transaction = TransactionCreate {
         datetime: transaction.datetime,
         amount: transaction.amount,
