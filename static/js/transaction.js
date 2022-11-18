@@ -1,40 +1,83 @@
 // load list of transactions
 let transaction_list = document.querySelector("#transaction_list");
 fetch("/api/transaction")
-	.then((response) => response.json())
-	.then((data) => {
-		for (item of data) {
-			let li = document.createElement('li');
-			li.classList.add("list-group-item");
-			// let liNode = document.createTextNode(item["amount"]);
-			// li.appendChild(liNode);
-			let row = document.createElement("div");
-			row.classList.add("row");
-			li.appendChild(row);
-			let column1 = document.createElement("div");
-			column1.classList.add("col");
-			column1.classList.add("d-flex");
-			column1.classList.add("align-items-center");
-			row.appendChild(column1);
-			let amount_text = document.createTextNode(item["amount"]);
-			column1.appendChild(amount_text);
-			let column2 = document.createElement("div");
-			column2.classList.add("col-auto");
-			column2.classList.add("d-flex");
-			column2.classList.add("align-items-center");
-			row.appendChild(column2);
-			let edit_button = document.createElement("button");
-			edit_button.classList.add("btn");
-			edit_button.classList.add("btn-sm");
-			edit_button.classList.add("btn-primary");
-			column2.appendChild(edit_button);
-			let pencil_svg = document.createElement("svg");
-			pencil_svg.classList.add("bi");
-			pencil_svg.classList.add("bi-pencil-square");
-			edit_button.appendChild(pencil_svg);
-			transaction_list.appendChild(li);
+.then((response) => response.json())
+.then((data) => {
+	let dom_container = document.createElement("div");
+	dom_container.classList.add("container");
+	let dom_row = document.createElement("div");
+	dom_row.classList.add("row");
+	let dom_column_base = document.createElement("div");
+	dom_column_base.classList.add("d-flex");
+	dom_column_base.classList.add("align-items-center");
+	let dom_column = dom_column_base.cloneNode();
+	dom_column.classList.add("col");
+	let dom_column_auto = dom_column_base.cloneNode();
+	dom_column_auto.classList.add("col-auto");
+
+	for (item of data) {
+		let amount_value = item["amount"];
+		let datetime_data = item["datetime"] * 1000;
+		datetime_data = new Date(datetime_data);
+		let datetime_value;
+		{
+			let date = datetime_data.getDate();
+			let month = datetime_data.getMonth();
+			let year = datetime_data.getFullYear();
+			let hour = `${datetime_data.getHours()}`.padStart(2, '0');
+			let minute = `${datetime_data.getMinutes()}`.padStart(2, '0');
+			let second = `${datetime_data.getSeconds()}`.padStart(2, '0');
+			datetime_value = `${date}/${month}/${year} ${hour}:${minute}:${second}`
 		}
-	});
+		let li = document.createElement('li');
+		li.classList.add("list-group-item");
+		let container1 = dom_container.cloneNode();
+		let row = dom_row.cloneNode();
+
+		let column1 = dom_column_auto.cloneNode();
+		let icon_svg = document.createElement("svg");
+		icon_svg.classList.add("bi");
+		icon_svg.classList.add("bi-1-circle");
+		column1.appendChild(icon_svg);
+		row.appendChild(column1);
+
+		let column2 = dom_column.cloneNode();
+		row.appendChild(column2);
+
+		let column3 = dom_column.cloneNode();
+		let column3container = dom_container.cloneNode();
+		let column3row1 = dom_row.cloneNode();
+		let column3row2 = dom_row.cloneNode();
+		let amount_span = document.createElement("span");
+		let amount_text = document.createTextNode(amount_value);
+		let datetime_span = document.createElement("span");
+		let datetime_text = document.createTextNode(datetime_value);
+		amount_span.appendChild(amount_text);
+		datetime_span.appendChild(datetime_text);
+		column3row1.appendChild(amount_span);
+		column3row2.appendChild(datetime_span);
+		column3container.appendChild(column3row1);
+		column3container.appendChild(column3row2);
+		column3.appendChild(column3container);
+		row.appendChild(column3);
+
+		let column4 = dom_column_auto.cloneNode();
+		row.appendChild(column4);
+		let edit_button = document.createElement("button");
+		edit_button.classList.add("btn");
+		edit_button.classList.add("btn-sm");
+		edit_button.classList.add("btn-primary");
+		column4.appendChild(edit_button);
+		let pencil_svg = document.createElement("svg");
+		pencil_svg.classList.add("bi");
+		pencil_svg.classList.add("bi-pencil-square");
+		edit_button.appendChild(pencil_svg);
+
+		li.appendChild(container1);
+		container1.appendChild(row);
+		transaction_list.appendChild(li);
+	}
+});
 
 
 // edit transaction
@@ -89,7 +132,7 @@ function update_datetime_input(once) {
 	let now = new Date();
 	let now_date = "";
 	now_date += `${String(now.getFullYear()).padStart(2, '0')}-`;
-	now_date += `${String(now.getMonth()).padStart(2, '0')}-`;
+	now_date += `${String(now.getMonth()+1).padStart(2, '0')}-`;
 	now_date += `${String(now.getDate()).padStart(2, '0')}`;
 	let now_time = "";
 	now_time += `${String(now.getHours()).padStart(2, '0')}:`;
