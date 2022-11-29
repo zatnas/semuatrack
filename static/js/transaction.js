@@ -147,6 +147,7 @@ function update_datetime_input(once) {
 }
 
 function start_update_datetime_input() {
+	stop_update_datetime_input();
 	update_datetime_input(true);
 	update_datetime_timeout = setTimeout(
 		update_datetime_input,
