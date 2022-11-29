@@ -21,8 +21,8 @@ fetch("/api/transaction")
 		datetime_data = new Date(datetime_data);
 		let datetime_value;
 		{
-			let date = datetime_data.getDate();
-			let month = datetime_data.getMonth();
+			let date = `${datetime_data.getDate()}`.padStart(2, '0');
+			let month = `${datetime_data.getMonth() + 1}`.padStart(2, '0');
 			let year = datetime_data.getFullYear();
 			let hour = `${datetime_data.getHours()}`.padStart(2, '0');
 			let minute = `${datetime_data.getMinutes()}`.padStart(2, '0');
