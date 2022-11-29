@@ -161,12 +161,16 @@ function stop_update_datetime_input() {
 
 if (current_datetime_mode == "Now") {
 	start_update_datetime_input();
+	date_input.setAttribute("disabled", "");
+	time_input.setAttribute("disabled", "");
 }
 
 datetime_now_button.addEventListener("click", () => {
 	datetime_mode.textContent = "Now";
 	datetime_custom_button.classList.remove("active");
 	datetime_now_button.classList.add("active");
+	date_input.setAttribute("disabled", "");
+	time_input.setAttribute("disabled", "");
 	start_update_datetime_input();
 });
 datetime_custom_button.addEventListener("click", () => {
@@ -175,5 +179,7 @@ datetime_custom_button.addEventListener("click", () => {
 	datetime_custom_button.classList.add("active");
 	date_input.value = "";
 	time_input.value = "";
+	date_input.removeAttribute("disabled");
+	time_input.removeAttribute("disabled");
 	stop_update_datetime_input();
 });
