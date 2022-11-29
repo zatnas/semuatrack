@@ -14,11 +14,14 @@ fetch("/api/transaction")
 	dom_column.classList.add("col");
 	let dom_column_auto = dom_column_base.cloneNode();
 	dom_column_auto.classList.add("col-auto");
+	let dom_span = document.createElement("span");
 
 	for (item of data) {
 		let amount_value = item["amount"];
 		let datetime_data = item["datetime"] * 1000;
 		datetime_data = new Date(datetime_data);
+		let note_value = item["note"];
+		let place_value = item["place"];
 		let datetime_value;
 		{
 			let date = `${datetime_data.getDate()}`.padStart(2, '0');
@@ -42,22 +45,38 @@ fetch("/api/transaction")
 		row.appendChild(column1);
 
 		let column2 = dom_column.cloneNode();
+		let column2container = dom_container.cloneNode()
+		let note_div = dom_row.cloneNode();
+		let place_div = dom_row.cloneNode();
+		let note_span = dom_span.cloneNode();
+		let place_span = dom_span.cloneNode();
+		let note_text = document.createTextNode(note_value);
+		let place_text = document.createTextNode(place_value);
+		note_span.appendChild(note_text);
+		place_span.appendChild(place_text);
+		note_div.appendChild(note_span);
+		place_div.appendChild(place_span);
+		column2container.appendChild(note_div);
+		column2container.appendChild(place_div);
+		column2.appendChild(column2container)
 		row.appendChild(column2);
 
 		let column3 = dom_column.cloneNode();
 		let column3container = dom_container.cloneNode();
-		let column3row1 = dom_row.cloneNode();
-		let column3row2 = dom_row.cloneNode();
+		let amount_div = dom_row.cloneNode();
+		let datetime_div = dom_row.cloneNode();
+		amount_div.classList.add("text-end");
+		datetime_div.classList.add("text-end");
 		let amount_span = document.createElement("span");
 		let amount_text = document.createTextNode(amount_value);
 		let datetime_span = document.createElement("span");
 		let datetime_text = document.createTextNode(datetime_value);
 		amount_span.appendChild(amount_text);
 		datetime_span.appendChild(datetime_text);
-		column3row1.appendChild(amount_span);
-		column3row2.appendChild(datetime_span);
-		column3container.appendChild(column3row1);
-		column3container.appendChild(column3row2);
+		amount_div.appendChild(amount_span);
+		datetime_div.appendChild(datetime_span);
+		column3container.appendChild(amount_div);
+		column3container.appendChild(datetime_div);
 		column3.appendChild(column3container);
 		row.appendChild(column3);
 
