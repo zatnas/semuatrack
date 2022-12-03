@@ -5,7 +5,16 @@ CREATE TABLE 'cashflow' (
 	amount REAL NOT NULL CHECK(ROUND(amount, 2) == amount),
 	note TEXT,
 	place TEXT,
+	FOREIGN KEY (category_id) REFERENCES 'category'(id)
 );
+
+CREATE TABLE 'category' (
+	id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+	name TEXT NOT NULL,
+	color TEXT,
+	icon TEXT
+);
+
 
 INSERT INTO 'cashflow' (datetime, amount, note, place) VALUES (
 	CAST(strftime('%s', '2022-10-10 20:30:12') as integer),
