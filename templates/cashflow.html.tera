@@ -3,7 +3,7 @@
 {% block content %}
 <div class="card my-3">
 	<div class="card-body">
-		<form action="/transaction" method="POST">
+		<form action="/cashflow" method="POST">
 			<div class="row mb-3">
 				<label for="amount_input" class="col-md-2 col-form-label">Amount</label>
 				<div class="col-md-10">
@@ -43,12 +43,12 @@
 </div>
 <div class="card my-3">
 	<div class="card-body d-flex flex-row align-items-center justify-content-between">
-		<h4 class="m-0">List of Transactions</h4>
+		<h4 class="m-0">List of Cashflow</h4>
 		<button id="refresh_button" class="btn btn-primary">Refresh</button>
 	</div>
 	<div class="card-body">
 		<div class="card">
-			<ul id="transaction_list" class="list-group list-group-flush user-select-none">
+			<ul id="cashflow_list" class="list-group list-group-flush user-select-none">
 			</ul>
 		</div>
 	</div>
@@ -56,5 +56,5 @@
 {% endblock content %}
 
 {% block script %}
-<script src="/js/transaction.js"></script>
+<script src="/js/cashflow.js"></script>
 {% endblock script %}

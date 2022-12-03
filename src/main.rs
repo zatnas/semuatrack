@@ -29,7 +29,7 @@ fn establish_connection() -> SqliteConnection {
 }
 
 #[derive(FromForm, Deserialize, Clone)]
-struct TransactionPost<'r> {
+struct CashflowPost<'r> {
     datetime: i32,
     amount: f32,
     #[field(default = None)]
@@ -40,67 +40,63 @@ struct TransactionPost<'r> {
 
 #[get("/")]
 fn index() -> Redirect {
-    Redirect::to(uri!(transaction_ui()))
+    Redirect::to(uri!(cashflow_ui()))
 }
 
-#[get("/transaction/<id>")]
-fn get_transaction_id(id: u16) -> String {
-    format!("Get transaction of id {}", id)
+#[get("/cashflow/<id>")]
+fn get_cashflow_id(id: u16) -> String {
+    format!("Get cashflow of id {}", id)
 }
 
-#[get("/transaction")]
-fn transaction_ui() -> Template {
+#[get("/cashflow")]
+fn cashflow_ui() -> Template {
     Template::render(
-        "transaction",
+        "cashflow",
         context!(
-        title: "Transaction"
+        title: "Cashflow"
         ),
     )
 }
 
-#[get("/transaction")]
-fn get_transaction_all() -> Option<Json<Vec<Transaction>>> {
-    let results = transactions::table
-        .order(transactions::id.desc())
-        .load::<Transaction>(&mut establish_connection())
-        .expect("Error loading transactions");
+#[get("/cashflow")]
+fn get_cashflow_all() -> Option<Json<Vec<Cashflow>>> {
+    let results = cashflow::table
+        .order(cashflow::id.desc())
+        .load::<Cashflow>(&mut establish_connection())
+        .expect("Error loading cashflow");
 
     Some(Json(results))
 }
 
-#[post("/transaction", data = "<transaction>", rank = 3)]
-fn create_transaction_json(transaction: Json<TransactionPost>) {
-    println!("{}", transaction.amount)
+#[post("/cashflow", data = "<cashflow>", rank = 3)]
+fn create_cashflow_json(cashflow: Json<CashflowPost>) {
+    println!("{}", cashflow.amount)
 }
 
-#[post("/transaction", data = "<transaction>", rank = 2)]
-fn create_transaction_form(transaction: Form<TransactionPost>) -> Redirect {
-    println!("Add new transaction: {}", transaction.amount);
-    let new_transaction = TransactionCreate {
-        datetime: transaction.datetime,
-        amount: transaction.amount,
-        note: transaction.note,
-        place: transaction.place,
+#[post("/cashflow", data = "<cashflow>", rank = 2)]
+fn create_cashflow_form(cashflow: Form<CashflowPost>) -> Redirect {
+    println!("Add new cashflow: {}", cashflow.amount);
+    let new_cashflow = NewCashflow {
+        datetime: cashflow.datetime,
+        amount: cashflow.amount,
+        note: cashflow.note,
+        place: cashflow.place,
     };
-    let _insert = diesel::insert_into(transactions::table)
-        .values(&new_transaction)
+    let _insert = diesel::insert_into(cashflow::table)
+        .values(&new_cashflow)
         .execute(&mut establish_connection())
-        .expect("Error creating new transaction");
-    Redirect::to(uri!(transaction_ui()))
+        .expect("Error creating new cashflow");
+    Redirect::to(uri!(cashflow_ui()))
 }
 
 #[launch]
 fn rocket() -> Rocket<Build> {
     rocket::build()
-        .mount("/", routes![index, transaction_ui, create_transaction_form])
+        .mount("/", routes![index, cashflow_ui, create_cashflow_form])
         .mount("/", FileServer::from(relative!("static")))
         .mount(
             "/api",
-            routes![
-                get_transaction_id,
-                get_transaction_all,
-                create_transaction_json,
-            ],
+            routes![get_cashflow_id, get_cashflow_all, create_cashflow_json,],
         )
         .attach(Template::fairing())
 }

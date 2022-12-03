@@ -1,7 +1,7 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
-    transactions (id) {
+    cashflow (id) {
         id -> Integer,
         datetime -> Integer,
         amount -> Float,

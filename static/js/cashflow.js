@@ -1,6 +1,6 @@
-// load list of transactions
-let transaction_list = document.querySelector("#transaction_list");
-fetch("/api/transaction")
+// load list of cashflow
+let cashflow_list = document.querySelector("#cashflow_list");
+fetch("/api/cashflow")
 .then((response) => response.json())
 .then((data) => {
 	let dom_container = document.createElement("div");
@@ -94,14 +94,14 @@ fetch("/api/transaction")
 
 		li.appendChild(container1);
 		container1.appendChild(row);
-		transaction_list.appendChild(li);
+		cashflow_list.appendChild(li);
 	}
 });
 
 
-// edit transaction
-// DOM transaction_list
-transaction_list.addEventListener("dblclick", function(click) {
+// edit cashflow
+// DOM cashflow_list
+cashflow_list.addEventListener("dblclick", function(click) {
 	console.log(click);
 });
 
