@@ -14,7 +14,7 @@ mod schema;
 
 #[get("/")]
 fn index() -> Redirect {
-    Redirect::to(uri!(cashflow::cashflow_ui()))
+    Redirect::to(uri!("/cashflow", cashflow::cashflow_ui()))
 }
 
 #[launch]
