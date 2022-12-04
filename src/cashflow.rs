@@ -1,5 +1,5 @@
-use crate::Cashflow;
-use crate::NewCashflow;
+use crate::models::Cashflow;
+use crate::models::NewCashflow;
 use diesel::prelude::*;
 use rocket::form::Form;
 use rocket::response::Redirect;
