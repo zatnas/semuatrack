@@ -2,10 +2,10 @@
 
 diesel::table! {
     cashflow (id) {
-        id -> Integer,
-        category_id -> Nullable<Integer>,
-        datetime -> Integer,
-        amount -> Float,
+        id -> Int8,
+        category_id -> Nullable<Int2>,
+        datetime -> Int8,
+        amount -> Numeric,
         note -> Nullable<Text>,
         place -> Nullable<Text>,
     }
@@ -13,7 +13,7 @@ diesel::table! {
 
 diesel::table! {
     category (id) {
-        id -> Integer,
+        id -> Int2,
         name -> Text,
         color -> Nullable<Text>,
         icon -> Nullable<Text>,

@@ -9,5 +9,6 @@ edition = "2021"
 rocket = { version = "0.5.0-rc.2", features = ["json"] }
 rocket_dyn_templates = { version = "0.1.0-rc.2", features = ["tera"] }
 serde = { version = "1.0.140", features = ["derive"] }
-diesel = { version = "2.0.0-rc.1", features = ["sqlite"] }
+diesel = { version = "2.0.2", features = ["postgres", "numeric"] }
 dotenv = { version = "0.15" }
+bigdecimal = { version = "0.3.0", features = ["serde"] }

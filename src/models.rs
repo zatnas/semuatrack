@@ -1,14 +1,15 @@
 use super::schema::*;
+use bigdecimal::BigDecimal;
 use diesel::prelude::Queryable;
 use diesel::prelude::*;
 use serde::Serialize;
 
 #[derive(Debug, Queryable, Serialize)]
 pub struct Cashflow {
-    pub id: i32,
-    pub category_id: Option<i32>,
-    pub datetime: i32,
-    pub amount: f32,
+    pub id: i64,
+    pub category_id: Option<i16>,
+    pub datetime: i64,
+    pub amount: BigDecimal,
     pub note: Option<String>,
     pub place: Option<String>,
 }
@@ -16,15 +17,15 @@ pub struct Cashflow {
 #[derive(Debug, Insertable)]
 #[diesel(table_name = cashflow)]
 pub struct NewCashflow<'r> {
-    pub datetime: i32,
-    pub amount: f32,
+    pub datetime: i64,
+    pub amount: &'r BigDecimal,
     pub note: Option<&'r str>,
     pub place: Option<&'r str>,
 }
 
 #[derive(Debug, Queryable, Serialize)]
 pub struct Category {
-    pub id: i32,
+    pub id: i16,
     pub name: String,
     pub color: Option<String>,
     pub icon: Option<String>,

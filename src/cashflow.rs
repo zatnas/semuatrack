@@ -1,5 +1,7 @@
 use crate::models::Cashflow;
 use crate::models::NewCashflow;
+use bigdecimal::BigDecimal;
+use bigdecimal::FromPrimitive;
 use diesel::prelude::*;
 use rocket::form::Form;
 use rocket::response::Redirect;
@@ -7,9 +9,9 @@ use rocket::serde::{json::Json, Deserialize};
 use rocket_dyn_templates::{context, Template};
 use semuatrack::establish_connection;
 
-#[derive(FromForm, Deserialize, Clone)]
+#[derive(FromForm, Deserialize)]
 struct CashflowPost<'r> {
-    datetime: i32,
+    datetime: i64,
     amount: f32,
     #[field(default = None)]
     note: Option<&'r str>,
@@ -48,12 +50,12 @@ fn create_cashflow_json(cashflow: Json<CashflowPost>) {
     println!("{}", cashflow.amount)
 }
 
-#[post("/", data = "<cashflow>", rank = 2)]
+#[post("/", data = "<cashflow>")]
 fn create_cashflow_form(cashflow: Form<CashflowPost>) -> Redirect {
-    println!("Add new cashflow: {}", cashflow.amount);
+    let amount = BigDecimal::from_f32(cashflow.amount).unwrap();
     let new_cashflow = NewCashflow {
         datetime: cashflow.datetime,
-        amount: cashflow.amount,
+        amount: &amount,
         note: cashflow.note,
         place: cashflow.place,
     };
