@@ -111,6 +111,9 @@ let datetime_input = document.querySelector("#datetime_input");
 let date_input = document.querySelector("#date_input");
 let time_input = document.querySelector("#time_input");
 function datetime_value(
+	/*
+	Return UTC in seconds
+	*/
 	date_string = (new Date()).toDateString(),
 	time_string = ""
 ) {
