@@ -19,6 +19,14 @@ struct CashflowPost<'r> {
     place: Option<&'r str>,
 }
 
+#[derive(Deserialize)]
+struct CashflowJson<'r> {
+    datetime: i64,
+    amount: BigDecimal,
+    note: Option<&'r str>,
+    place: Option<&'r str>,
+}
+
 #[get("/<id>")]
 fn get_cashflow_id(id: u16) -> String {
     format!("Get cashflow of id {}", id)
@@ -45,9 +53,22 @@ fn get_cashflow_all() -> Option<Json<Vec<Cashflow>>> {
     Some(Json(results))
 }
 
-#[post("/", data = "<cashflow>", rank = 3)]
-fn create_cashflow_json(cashflow: Json<CashflowPost>) {
-    println!("{}", cashflow.amount)
+#[post("/", data = "<cashflow>")]
+fn create_cashflow_json(cashflow: Json<CashflowJson>) -> Option<Json<Vec<Cashflow>>> {
+    let new_cashflow = NewCashflow {
+        datetime: cashflow.datetime,
+        amount: &cashflow.amount,
+        note: cashflow.note,
+        place: cashflow.place,
+    };
+    let connection = &mut establish_connection();
+    let row = diesel::insert_into(crate::schema::cashflow::table)
+        .values(&new_cashflow)
+        .returning(crate::schema::cashflow::all_columns)
+        .get_results(connection)
+        .expect("Error creating new cashflow");
+
+    Some(Json(row))
 }
 
 #[post("/", data = "<cashflow>")]
