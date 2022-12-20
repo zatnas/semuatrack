@@ -33,8 +33,8 @@ pub struct Category {
 
 #[derive(Debug, Insertable)]
 #[diesel(table_name = category)]
-pub struct NewCategory {
-    pub name: String,
-    pub color: String,
-    pub icon: String,
+pub struct NewCategory<'r> {
+    pub name: &'r str,
+    pub color: Option<&'r str>,
+    pub icon: Option<&'r str>,
 }

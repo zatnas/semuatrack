@@ -1,6 +1,5 @@
 #[macro_use]
 extern crate rocket;
-extern crate dotenv;
 
 use rocket::fs::{relative, FileServer};
 use rocket::response::Redirect;
@@ -9,6 +8,7 @@ use rocket_dyn_templates::Template;
 use std::env;
 
 mod cashflow;
+mod category;
 mod models;
 mod schema;
 
@@ -24,5 +24,6 @@ fn rocket() -> Rocket<Build> {
         .mount("/", routes![index,])
         .mount("/cashflow", cashflow::route())
         .mount("/api/cashflow", cashflow::api_route())
+        .mount("/api/category", category::api_route())
         .attach(Template::fairing())
 }
