@@ -7,6 +7,7 @@ use serde::Serialize;
 #[derive(Debug, Queryable, Serialize)]
 pub struct Cashflow {
     pub id: i64,
+    pub account_id: Option<i32>,
     pub category_id: Option<i16>,
     pub datetime: i64,
     pub amount: BigDecimal,
@@ -23,9 +24,19 @@ pub struct NewCashflow<'r> {
     pub place: Option<&'r str>,
 }
 
+#[derive(Debug, AsChangeset)]
+#[diesel(table_name = cashflow)]
+pub struct PatchCashflow<'r> {
+    pub datetime: Option<i64>,
+    pub amount: Option<&'r BigDecimal>,
+    pub note: Option<&'r str>,
+    pub place: Option<&'r str>,
+}
+
 #[derive(Debug, Queryable, Serialize)]
 pub struct Category {
     pub id: i16,
+    pub parent_id: Option<i16>,
     pub name: String,
     pub color: Option<String>,
     pub icon: Option<String>,

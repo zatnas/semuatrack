@@ -1,5 +1,6 @@
 use crate::models::Cashflow;
 use crate::models::NewCashflow;
+use crate::models::PatchCashflow;
 use bigdecimal::BigDecimal;
 use bigdecimal::FromPrimitive;
 use diesel::prelude::*;
@@ -27,6 +28,14 @@ struct CashflowJson<'r> {
     place: Option<&'r str>,
 }
 
+#[derive(Deserialize)]
+struct CashflowPatchJson<'r> {
+    datetime: Option<i64>,
+    amount: Option<f32>,
+    note: Option<&'r str>,
+    place: Option<&'r str>,
+}
+
 #[get("/<id>")]
 fn get_cashflow_id(id: u16) -> String {
     format!("Get cashflow of id {}", id)
@@ -42,19 +51,8 @@ fn cashflow_ui() -> Template {
     )
 }
 
-#[get("/")]
-fn get_cashflow_all() -> Option<Json<Vec<Cashflow>>> {
-    let connection = &mut establish_connection();
-    let results = crate::schema::cashflow::table
-        .order(crate::schema::cashflow::id.desc())
-        .load::<Cashflow>(connection)
-        .expect("Error loading cashflow");
-
-    Some(Json(results))
-}
-
 #[post("/", data = "<cashflow>")]
-fn create_cashflow_json(cashflow: Json<CashflowJson>) -> Option<Json<Vec<Cashflow>>> {
+fn create_cashflow_api(cashflow: Json<CashflowJson>) -> Option<Json<Vec<Cashflow>>> {
     let new_cashflow = NewCashflow {
         datetime: cashflow.datetime,
         amount: &cashflow.amount,
@@ -69,6 +67,40 @@ fn create_cashflow_json(cashflow: Json<CashflowJson>) -> Option<Json<Vec<Cashflo
         .expect("Error creating new cashflow");
 
     Some(Json(row))
+}
+
+#[get("/")]
+fn read_cashflow_api() -> Option<Json<Vec<Cashflow>>> {
+    let connection = &mut establish_connection();
+    let results = crate::schema::cashflow::table
+        .order(crate::schema::cashflow::id.desc())
+        .load::<Cashflow>(connection)
+        .expect("Error loading cashflow");
+
+    Some(Json(results))
+}
+
+#[patch("/<cashflow_id>", data = "<cashflow>")]
+fn update_cashflow_id_api(cashflow_id: i64, cashflow: Json<CashflowPatchJson>) -> Option<Json<Vec<Cashflow>>> {
+    let amount = match cashflow.amount {
+        Some(i) => BigDecimal::from_f32(i),
+        None => None
+    }.unwrap();
+    let user_patch = PatchCashflow {
+        datetime: cashflow.datetime,
+        amount: Some(&amount),
+        note: cashflow.note,
+        place: cashflow.place,
+    };
+    let connection = &mut establish_connection();
+    let query = diesel::update(crate::schema::cashflow::table)
+    .filter(crate::schema::cashflow::dsl::id.eq(cashflow_id))
+        .set(&user_patch)
+        .returning(crate::schema::cashflow::all_columns)
+        .get_results(connection)
+        .expect("Error updating cashflow");
+
+    Some(Json(query))
 }
 
 #[post("/", data = "<cashflow>")]
@@ -93,5 +125,5 @@ pub fn route() -> Vec<rocket::Route> {
 }
 
 pub fn api_route() -> Vec<rocket::Route> {
-    routes![get_cashflow_all, create_cashflow_json, get_cashflow_id]
+    routes![read_cashflow_api, create_cashflow_api, get_cashflow_id, update_cashflow_id_api]
 }
