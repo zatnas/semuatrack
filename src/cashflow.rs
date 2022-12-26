@@ -92,14 +92,18 @@ fn update_cashflow_id_api(
     cashflow_id: i64,
     cashflow: Json<CashflowPatchJson>,
 ) -> Option<Json<Vec<Cashflow>>> {
-    let amount = match cashflow.amount {
-        Some(i) => BigDecimal::from_f32(i),
-        None => None,
-    }
+    let binding = BigDecimal::from_f32(match cashflow.amount {
+        Some(i) => i,
+        None => 0f32,
+    })
     .unwrap();
+    let amount = match cashflow.amount {
+        Some(_) => Some(&binding),
+        None => None,
+    };
     let user_patch = PatchCashflow {
         datetime: cashflow.datetime,
-        amount: Some(&amount),
+        amount,
         note: cashflow.note,
         place: cashflow.place,
     };
