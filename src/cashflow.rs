@@ -39,12 +39,6 @@ struct CashflowPatchJson<'r> {
     place: Option<&'r str>,
 }
 
-#[openapi]
-#[get("/<id>")]
-fn get_cashflow_id(id: u16) -> String {
-    format!("Get cashflow of id {}", id)
-}
-
 #[get("/")]
 fn cashflow_ui() -> Template {
     Template::render(
@@ -80,6 +74,20 @@ fn read_cashflow_api() -> Option<Json<Vec<Cashflow>>> {
     let connection = &mut establish_connection();
     let results = crate::schema::cashflow::table
         .order(crate::schema::cashflow::id.desc())
+        .load::<Cashflow>(connection)
+        .expect("Error loading cashflow");
+
+    Some(Json(results))
+}
+
+#[openapi]
+#[get("/<id>")]
+fn read_cashflow_api_id(id: i64) -> Option<Json<Vec<Cashflow>>> {
+    use crate::schema::cashflow;
+
+    let connection = &mut establish_connection();
+    let results = cashflow::table
+        .filter(cashflow::id.eq(id))
         .load::<Cashflow>(connection)
         .expect("Error loading cashflow");
 
@@ -143,7 +151,7 @@ pub fn api_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, O
     openapi_get_routes_spec![
         settings: read_cashflow_api,
         create_cashflow_api,
-        get_cashflow_id,
+        read_cashflow_api_id,
         update_cashflow_id_api
     ]
 }
