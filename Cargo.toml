@@ -12,3 +12,6 @@ serde = { version = "1.0.140", features = ["derive"] }
 diesel = { version = "2.0.2", features = ["postgres", "numeric"] }
 dotenv = { version = "0.15" }
 bigdecimal = { version = "0.3.0", features = ["serde"] }
+rocket_okapi = { version = "0.8.0-rc.2", features = ["swagger"] }
+schemars = { version = "0.8.10", features = ["bigdecimal"] }
+okapi = "0.7.0-rc.1"

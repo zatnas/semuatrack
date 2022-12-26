@@ -2,9 +2,10 @@ use super::schema::*;
 use bigdecimal::BigDecimal;
 use diesel::prelude::Queryable;
 use diesel::prelude::*;
+use rocket_okapi::JsonSchema;
 use serde::Serialize;
 
-#[derive(Debug, Queryable, Serialize)]
+#[derive(Debug, Queryable, Serialize, JsonSchema)]
 pub struct Cashflow {
     pub id: i64,
     pub account_id: Option<i32>,
@@ -24,7 +25,7 @@ pub struct NewCashflow<'r> {
     pub place: Option<&'r str>,
 }
 
-#[derive(Debug, AsChangeset)]
+#[derive(Debug, AsChangeset, JsonSchema)]
 #[diesel(table_name = cashflow)]
 pub struct PatchCashflow<'r> {
     pub datetime: Option<i64>,
@@ -33,7 +34,7 @@ pub struct PatchCashflow<'r> {
     pub place: Option<&'r str>,
 }
 
-#[derive(Debug, Queryable, Serialize)]
+#[derive(Debug, Queryable, Serialize, JsonSchema)]
 pub struct Category {
     pub id: i16,
     pub parent_id: Option<i16>,

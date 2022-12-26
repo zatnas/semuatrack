@@ -8,6 +8,9 @@ use rocket::form::Form;
 use rocket::response::Redirect;
 use rocket::serde::{json::Json, Deserialize};
 use rocket_dyn_templates::{context, Template};
+use rocket_okapi::okapi::openapi3::OpenApi;
+use rocket_okapi::settings::OpenApiSettings;
+use rocket_okapi::{openapi, openapi_get_routes_spec, JsonSchema};
 use semuatrack::establish_connection;
 
 #[derive(FromForm, Deserialize)]
@@ -20,7 +23,7 @@ struct CashflowPost<'r> {
     place: Option<&'r str>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, JsonSchema)]
 struct CashflowJson<'r> {
     datetime: i64,
     amount: BigDecimal,
@@ -28,7 +31,7 @@ struct CashflowJson<'r> {
     place: Option<&'r str>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, JsonSchema)]
 struct CashflowPatchJson<'r> {
     datetime: Option<i64>,
     amount: Option<f32>,
@@ -36,6 +39,7 @@ struct CashflowPatchJson<'r> {
     place: Option<&'r str>,
 }
 
+#[openapi]
 #[get("/<id>")]
 fn get_cashflow_id(id: u16) -> String {
     format!("Get cashflow of id {}", id)
@@ -51,6 +55,7 @@ fn cashflow_ui() -> Template {
     )
 }
 
+#[openapi]
 #[post("/", data = "<cashflow>")]
 fn create_cashflow_api(cashflow: Json<CashflowJson>) -> Option<Json<Vec<Cashflow>>> {
     let new_cashflow = NewCashflow {
@@ -69,6 +74,7 @@ fn create_cashflow_api(cashflow: Json<CashflowJson>) -> Option<Json<Vec<Cashflow
     Some(Json(row))
 }
 
+#[openapi]
 #[get("/")]
 fn read_cashflow_api() -> Option<Json<Vec<Cashflow>>> {
     let connection = &mut establish_connection();
@@ -80,12 +86,17 @@ fn read_cashflow_api() -> Option<Json<Vec<Cashflow>>> {
     Some(Json(results))
 }
 
+#[openapi]
 #[patch("/<cashflow_id>", data = "<cashflow>")]
-fn update_cashflow_id_api(cashflow_id: i64, cashflow: Json<CashflowPatchJson>) -> Option<Json<Vec<Cashflow>>> {
+fn update_cashflow_id_api(
+    cashflow_id: i64,
+    cashflow: Json<CashflowPatchJson>,
+) -> Option<Json<Vec<Cashflow>>> {
     let amount = match cashflow.amount {
         Some(i) => BigDecimal::from_f32(i),
-        None => None
-    }.unwrap();
+        None => None,
+    }
+    .unwrap();
     let user_patch = PatchCashflow {
         datetime: cashflow.datetime,
         amount: Some(&amount),
@@ -94,7 +105,7 @@ fn update_cashflow_id_api(cashflow_id: i64, cashflow: Json<CashflowPatchJson>) -
     };
     let connection = &mut establish_connection();
     let query = diesel::update(crate::schema::cashflow::table)
-    .filter(crate::schema::cashflow::dsl::id.eq(cashflow_id))
+        .filter(crate::schema::cashflow::dsl::id.eq(cashflow_id))
         .set(&user_patch)
         .returning(crate::schema::cashflow::all_columns)
         .get_results(connection)
@@ -124,6 +135,11 @@ pub fn route() -> Vec<rocket::Route> {
     routes![create_cashflow_form, cashflow_ui,]
 }
 
-pub fn api_route() -> Vec<rocket::Route> {
-    routes![read_cashflow_api, create_cashflow_api, get_cashflow_id, update_cashflow_id_api]
+pub fn api_routes_and_docs(settings: &OpenApiSettings) -> (Vec<rocket::Route>, OpenApi) {
+    openapi_get_routes_spec![
+        settings: read_cashflow_api,
+        create_cashflow_api,
+        get_cashflow_id,
+        update_cashflow_id_api
+    ]
 }
