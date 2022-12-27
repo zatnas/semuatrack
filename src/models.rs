@@ -25,7 +25,7 @@ pub struct NewCashflow<'r> {
     pub place: Option<&'r str>,
 }
 
-#[derive(Debug, AsChangeset, JsonSchema)]
+#[derive(Debug, AsChangeset)]
 #[diesel(table_name = cashflow)]
 pub struct PatchCashflow<'r> {
     pub datetime: Option<i64>,
